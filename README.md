@@ -5,3 +5,4 @@ demo Jenkins
 ## Test branche main
 ## restart
 ## création Github serveur
+## erase reconstruct premier pipeline
