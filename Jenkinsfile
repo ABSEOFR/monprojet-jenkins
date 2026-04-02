@@ -4,7 +4,6 @@ pipeline {
     environment {
         IMAGE_NAME = "contacts-api"
         IMAGE_TAG  = "${BUILD_NUMBER}"
-        PORT       = "3000"
     }
 
     stages {
@@ -29,18 +28,23 @@ pipeline {
             }
         }
 
-        stage('Deploiement') {
+        stage('Import image dans K3s') {
             steps {
-                sh 'docker stop contacts-api || true'
-                sh 'docker rm contacts-api || true'
-                sh 'docker run -d --name contacts-api --restart unless-stopped -p 3000:3000 contacts-api:latest'
+                sh "docker save ${IMAGE_NAME}:latest | k3s ctr images import -"
+            }
+        }
+
+        stage('Deploy sur Kubernetes') {
+            steps {
+                sh "kubectl rollout restart deployment contacts-api"
+                sh "kubectl rollout status deployment contacts-api --timeout=60s"
             }
         }
     }
 
     post {
         success {
-            echo 'Contacts API deployee avec succes sur le port 3000 !'
+            echo 'Contacts API deployee avec succes sur Kubernetes !'
         }
         failure {
             echo 'Echec du pipeline'
