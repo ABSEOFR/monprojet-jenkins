@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "monapp"
+        IMAGE_NAME = "contacts-api"
         IMAGE_TAG  = "${BUILD_NUMBER}"
+        PORT       = "3000"
     }
 
     stages {
@@ -30,16 +31,16 @@ pipeline {
 
         stage('Deploiement') {
             steps {
-                sh 'docker stop monapp-container || true'
-                sh 'docker rm monapp-container || true'
-                sh 'docker run -d --name monapp-container --restart unless-stopped -p 8081:80 monapp:latest'
+                sh 'docker stop contacts-api || true'
+                sh 'docker rm contacts-api || true'
+                sh 'docker run -d --name contacts-api --restart unless-stopped -p 3000:3000 contacts-api:latest'
             }
         }
     }
 
     post {
         success {
-            echo 'Deploiement reussi !'
+            echo 'Contacts API deployee avec succes sur le port 3000 !'
         }
         failure {
             echo 'Echec du pipeline'
